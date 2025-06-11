@@ -1,28 +1,39 @@
 <?php
 
+// src/Controller/Admin/ProductCrudController.php
 namespace App\Controller\Admin;
 
 use App\Entity\Product;
+use App\Entity\Notification;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class ProductCrudController extends AbstractCrudController
 {
+    private EntityManagerInterface $em;
+
+    public function __construct(EntityManagerInterface $em)
+    {
+        $this->em = $em;
+    }
+
     public static function getEntityFqcn(): string
     {
         return Product::class;
     }
 
-    /*
-    public function configureFields(string $pageName): iterable
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
-        ];
+        if (!$entityInstance instanceof Product) {
+            return;
+        }
+
+        parent::updateEntity($entityManager, $entityInstance);
+
+        $notification = new Notification();
+        $notification->setLabel(sprintf('Le produit "%s" a été modifié.', $entityInstance->getName()));
+
+        $this->em->persist($notification);
+        $this->em->flush();
     }
-    */
 }

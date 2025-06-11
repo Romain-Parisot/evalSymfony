@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Notification;
 
 final class AppController extends AbstractController
 {
@@ -50,6 +51,21 @@ public function show(
         if ($user->getPoints() >= $totalPrice) {
             $user->setPoints($user->getPoints() - $totalPrice);
             $em->persist($user);
+
+            $notification = new Notification();
+            $notification->setLabel(sprintf(
+                'L\'utilisateur "%s" a acheté %d fois le produit: "%s".',
+                $user->getFirstName(),
+                $quantity,
+                $product->getName()
+            ));
+
+            if (method_exists($notification, 'setUser')) {
+                $notification->setUserNotification($user);
+            }
+
+            $em->persist($notification);
+
             $em->flush();
 
             $this->addFlash('success', 'Votre produit est bien commandé. Vous le recevrez sous peu !');

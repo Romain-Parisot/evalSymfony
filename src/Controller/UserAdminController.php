@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class UserAdminController extends AbstractController
 {
-    #[Route('/admin/add-points', name: 'admin_add_points')]
+#[Route('/admin/add-points', name: 'admin_add_points')]
 public function addPointsToActiveUsers(EntityManagerInterface $em, UserRepository $userRepository): Response
 {
     $users = $userRepository->findBy(['active' => true]);

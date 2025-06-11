@@ -41,6 +41,8 @@ security:
   access_control:
     - { path: ^/admin(/|$), roles: ROLE_ADMIN }
     - { path: ^/api(/|$), roles: ROLE_ADMIN }
+    - { path: ^/product, roles: ROLE_ADMIN }
+    - { path: ^/notification(/|$), roles: ROLE_ADMIN }
     - { path: ^/profile(/|$), roles: ROLE_USER }
     - { path: ^/.*, roles: PUBLIC_ACCESS }
 
