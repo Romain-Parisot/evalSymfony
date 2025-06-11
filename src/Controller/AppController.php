@@ -22,41 +22,47 @@ final class AppController extends AbstractController
         ]);
     }
 
-    #[Route('/product/{id}', name: 'product_show', methods: ['GET', 'POST'])]
-    public function show(
-        int $id,
-        ProductRepository $productRepository,
-        Request $request,
-        EntityManagerInterface $em
-    ): Response {
-        $product = $productRepository->find($id);
+#[Route('/product/{id}', name: 'product_show', methods: ['GET', 'POST'])]
+public function show(
+    int $id,
+    ProductRepository $productRepository,
+    Request $request,
+    EntityManagerInterface $em
+): Response {
+    $product = $productRepository->find($id);
 
-        /** @var User|null $user */
-        $user = $this->getUser();
+    /** @var User|null $user */
+    $user = $this->getUser();
 
-        if (!$product || !$user instanceof User) {
-            throw $this->createNotFoundException('Produit ou utilisateur introuvable');
-        }
-
-        if ($request->isMethod('POST')) {
-            $quantity = (int) $request->request->get('quantity', 1);
-            $totalPrice = $product->getPrice() * $quantity;
-
-            if ($user->getPoints() >= $totalPrice) {
-                $user->setPoints($user->getPoints() - $totalPrice);
-                $em->persist($user);
-                $em->flush();
-
-                $this->addFlash('success', 'Votre produit est bien commandé. Vous le recevrez sous peu !');
-                return $this->redirectToRoute('product_show', ['id' => $id]);
-            } else {
-                $this->addFlash('error', 'Points insuffisants pour commander ce produit.');
-            }
-        }
-
-        return $this->render('app/show.html.twig', [
-            'product' => $product,
-            'userPoints' => $user->getPoints(),
-        ]);
+    if (!$product || !$user instanceof User) {
+        throw $this->createNotFoundException('Produit ou utilisateur introuvable');
     }
+
+    if ($request->isMethod('POST')) {
+        if (!$user->isActive()) {
+            $this->addFlash('error', 'Votre compte a été désactivé, vous ne pouvez plus passer de commande.');
+            return $this->redirectToRoute('product_show', ['id' => $id]);
+        }
+
+        $quantity = (int) $request->request->get('quantity', 1);
+        $totalPrice = $product->getPrice() * $quantity;
+
+        if ($user->getPoints() >= $totalPrice) {
+            $user->setPoints($user->getPoints() - $totalPrice);
+            $em->persist($user);
+            $em->flush();
+
+            $this->addFlash('success', 'Votre produit est bien commandé. Vous le recevrez sous peu !');
+            return $this->redirectToRoute('product_show', ['id' => $id]);
+        } else {
+            $this->addFlash('error', 'Points insuffisants pour commander ce produit.');
+        }
+    }
+
+    return $this->render('app/show.html.twig', [
+        'product' => $product,
+        'userPoints' => $user->getPoints(),
+    ]);
+}
+
 }

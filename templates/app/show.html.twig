@@ -23,7 +23,7 @@
 <form method="POST">
     <div>
         <label for="quantity">Quantité :</label>
-        <select id="quantity" name="quantity">
+        <select id="quantity" name="quantity" {% if not app.user.active %}disabled{% endif %}>
             {% for i in 1..10 %}
                 <option value="{{ i }}">{{ i }}</option>
             {% endfor %}
@@ -35,8 +35,11 @@
         Vos points disponibles : <span>{{ userPoints }}</span>
     </p>
 
-    <button id="orderButton" type="submit" style="margin-top: 10px;">Commander</button>
+    <button id="orderButton" type="submit" style="margin-top: 10px;" {% if not app.user.active %}disabled{% endif %}>
+        Commander
+    </button>
 </form>
+
 
 <a href="{{ path('app_app') }}" style="display: block; margin-top: 20px;">← Retour à la liste</a>
 
@@ -48,6 +51,13 @@
         </div>
     {% endfor %}
 {% endfor %}
+
+{% if not app.user.active %}
+    <div style="color: red; font-weight: bold; margin-bottom: 20px;">
+        Votre compte a été désactivé, vous ne pouvez plus passer de commande.
+    </div>
+{% endif %}
+
 
 <script>
     const unitPrice = {{ product.price }};
