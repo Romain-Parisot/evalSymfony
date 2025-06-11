@@ -25,5 +25,11 @@ services:
       - { name: doctrine.event_listener, event: prePersist }
       - { name: doctrine.event_listener, event: preUpdate }
 
+  App\EventSubscriber\ProductSubscriber:
+    tags: ["doctrine.event_subscriber"]
+
+  App\EventSubscriber\UserSubscriber:
+    tags: ["doctrine.event_subscriber"]
+
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
