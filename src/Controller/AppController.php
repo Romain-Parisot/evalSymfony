@@ -10,16 +10,43 @@ use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Notification;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 final class AppController extends AbstractController
 {
-    #[Route('/', name: 'app_app')]
-    public function index(ProductRepository $productRepository): Response
-    {
+    #[Route('/', name: 'app_app', methods: ['GET', 'POST'])]
+    public function index(
+        Request $request,
+        ProductRepository $productRepository,
+        EntityManagerInterface $em
+    ): Response {
         $products = $productRepository->findAll();
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        $nameForm = null;
+
+        if ($user instanceof User) {
+            $form = $this->createFormBuilder($user)
+                ->add('firstName', TextType::class, ['label' => 'Prénom'])
+                ->add('lastName', TextType::class, ['label' => 'Nom'])
+                ->getForm();
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->flush();
+                $this->addFlash('success', 'Nom et prénom mis à jour avec succès.');
+                return $this->redirectToRoute('app_app');
+            }
+
+            $nameForm = $form->createView();
+        }
 
         return $this->render('app/index.html.twig', [
             'products' => $products,
+            'nameForm' => $nameForm,
         ]);
     }
 
@@ -80,5 +107,4 @@ public function show(
         'userPoints' => $user->getPoints(),
     ]);
 }
-
 }

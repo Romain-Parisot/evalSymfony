@@ -54,4 +54,24 @@
         </div>
     {% endfor %}
 </div>
+
+{% if nameForm is defined %}
+    <h2>Modifier mon prénom et mon nom</h2>
+
+    {{ form_start(nameForm) }}
+        <div>
+            {{ form_label(nameForm.firstName) }}
+            {{ form_widget(nameForm.firstName) }}
+            {{ form_errors(nameForm.firstName) }}
+        </div>
+        <div>
+            {{ form_label(nameForm.lastName) }}
+            {{ form_widget(nameForm.lastName) }}
+            {{ form_errors(nameForm.lastName) }}
+        </div>
+        <button type="submit">Enregistrer</button>
+    {{ form_end(nameForm) }}
+{% endif %}
+
+
 {% endblock %}
