@@ -48,6 +48,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToCrud('Users', 'fas fa-users', User::class);
         yield MenuItem::linkToCrud('Products', 'fas fa-home', Product::class);
+        yield MenuItem::linkToRoute('Ajouter 1000 points aux actifs', 'fas fa-plus-circle', 'admin_add_points');
         yield MenuItem::linkToRoute('Back to site', 'fas fa-home', 'app_app');
     }
 }
