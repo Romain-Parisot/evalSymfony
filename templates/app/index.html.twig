@@ -1,20 +1,57 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AppController!{% endblock %}
+{% block title %}Produits{% endblock %}
 
 {% block body %}
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .card {
+        background: #f8f8f8;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 16px;
+        width: 200px;
+        text-align: center;
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
+    .card a {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .card h3 {
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+    .card p {
+        margin: 0.5em 0 0;
+        color: #555;
+    }
 </style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<h1>Nos Produits</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/roroc/OneDrive - De Vinci/Bureau/TRAVAIL/A4/evalSymfony/src/Controller/AppController.php</code></li>
-        <li>Your template at <code>C:/Users/roroc/OneDrive - De Vinci/Bureau/TRAVAIL/A4/evalSymfony/templates/app/index.html.twig</code></li>
-    </ul>
+<div class="card-container">
+    {% for product in products %}
+        <div class="card">
+            <a href="{{ path('product_show', { id: product.id }) }}">
+                <h3>{{ product.name }}</h3>
+                <p>{{ product.price }} €</p>
+            </a>
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}

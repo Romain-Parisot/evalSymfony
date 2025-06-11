@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block body %}
+<h1>{{ product.name }}</h1>
+
+<ul>
+    <li><strong>Prix unitaire :</strong> {{ product.price }} €</li>
+    <li><strong>Catégorie :</strong> {{ product.category }}</li>
+    <li><strong>Description :</strong> {{ product.description }}</li>
+    <li><strong>Créé le :</strong> {{ product.createdAt|date('d/m/Y H:i') }}</li>
+    {% if product.updatedAt %}
+        <li><strong>Mis à jour le :</strong> {{ product.updatedAt|date('d/m/Y H:i') }}</li>
+    {% endif %}
+</ul>
+
+<hr>
+
+<h2>Commander</h2>
+
+{# FORMULAIRE POST #}
+<form method="POST">
+    <div>
+        <label for="quantity">Quantité :</label>
+        <select id="quantity" name="quantity">
+            {% for i in 1..10 %}
+                <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <p style="font-weight: bold; margin-top: 10px;">
+        Prix total : <span id="priceDisplay">{{ product.price }}</span> €<br>
+        Vos points disponibles : <span>{{ userPoints }}</span>
+    </p>
+
+    <button id="orderButton" type="submit" style="margin-top: 10px;">Commander</button>
+</form>
+
+<a href="{{ path('app_app') }}" style="display: block; margin-top: 20px;">← Retour à la liste</a>
+
+{# AFFICHAGE DES FLASH MESSAGES #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="flash-{{ label }}" style="color: {% if label == 'success' %}green{% else %}red{% endif %}; margin-top: 15px;">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+<script>
+    const unitPrice = {{ product.price }};
+    const userPoints = {{ userPoints }};
+    const priceDisplay = document.getElementById('priceDisplay');
+    const quantitySelect = document.getElementById('quantity');
+    const orderButton = document.getElementById('orderButton');
+
+    function updatePriceAndCheck() {
+        const quantity = parseInt(quantitySelect.value);
+        const total = unitPrice * quantity;
+
+        priceDisplay.textContent = total;
+
+        if (total > userPoints) {
+            priceDisplay.style.color = 'red';
+            orderButton.disabled = true;
+        } else {
+            priceDisplay.style.color = 'green';
+            orderButton.disabled = false;
+        }
+    }
+
+    quantitySelect.addEventListener('change', updatePriceAndCheck);
+    updatePriceAndCheck();
+</script>
+{% endblock %}
